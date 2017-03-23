@@ -1,0 +1,50 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>com.orange.weixin</groupId>
+  <artifactId>weixin-aggregator</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <packaging>pom</packaging>
+
+  <name>weixin-aggregator</name>
+  <url>http://maven.apache.org</url>
+  
+  <modules>
+  	<module>../weixin-web</module>
+  	<module>../weixin-serviceImpl</module>
+  	<module>../weixin-service</module>
+  	<module>../weixin-common</module>
+  	<module>../taskManager</module>
+  </modules>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+
+ <description>
+    	这是父模块，对子模块进行了集成，子模块对该模块进行了继承。主要作用是对公共配置的统一管理
+ </description>
+  
+  <dependencies>
+  	
+   	<dependency>
+	    <groupId>org.slf4j</groupId>
+	    <artifactId>slf4j-log4j12</artifactId>
+	    <version>1.7.21</version>
+	</dependency>
+
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.12</version>
+      <scope>test</scope>
+    </dependency>
+    
+	<dependency>
+			<groupId>com.alibaba</groupId>
+			<artifactId>fastjson</artifactId>
+			<version>1.2.16</version>
+	</dependency>
+  </dependencies>
+</project>

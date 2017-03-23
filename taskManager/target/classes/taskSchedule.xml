@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans 
+	xmlns="http://www.springframework.org/schema/beans" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+	http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans-4.3.xsd">
+	
+	<!-- 定时任务 -->
+	<bean id="fileClearService" class="com.orang.weixin.taskManager.common.service.task.FileClearService">
+		<property name="jmsTemplate" ref="jmsTopicTemplate"></property>
+	</bean>
+	
+	<!-- 轮询任务 -->
+	<bean id="messageSenderPollingTask" class="com.orang.weixin.taskManager.common.service.task.MessageSenderPollingService"></bean>
+	 
+	<!-- 定时任务容器 -->
+	<bean id="fileClearServiceTask" class="com.orang.weixin.taskManager.common.service.DefaultSchedulerInvoker">
+		<property name="serviceList">
+	 		<list>
+	 			<ref bean="fileClearService"/>
+	 		</list>
+	 	</property>
+	</bean>
+	
+	<!-- 轮询任务容器 -->
+	<bean id="messageSendTask" class="com.orang.weixin.taskManager.common.service.DefaultSchedulerInvoker">
+		<property name="serviceList">
+	 		<list>
+	 			<ref bean="messageSenderPollingTask"/>
+	 		</list>
+	 	</property>
+	</bean>
+	
+	<bean id="defaultTaskDetail" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean" >
+	    <property name="targetObject" ref="fileClearServiceTask"></property>
+	    <property name="targetMethod" value="doSchedule"></property>
+	</bean>
+	
+	<bean id="defaultTaskDetail2" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean" >
+	    <property name="targetObject" ref="messageSendTask"></property>
+	    <property name="targetMethod" value="doSchedule"></property>
+	</bean>
+	
+	<!-- 定时调度 -->
+	<bean id="cronTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="defaultTaskDetail" />
+        <!-- 每天凌晨0点1分执行 -->
+        <property name="cronExpression" value="0 20 15 * * ?" />
+    </bean>
+    
+    <!-- 轮询调度 -->
+    <bean id="simpleTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
+		<property name="jobDetail" ref="defaultTaskDetail2" />
+		<!--每30s启动一次-->
+		<property name="repeatInterval" value="15000" />
+		<!--延迟10s-->  
+		<property name="startDelay" value="10000" />
+		<!--重复5次-->  
+		<property name="repeatCount" value="5"/>  
+	</bean>
+	
+	 <!-- 调度服务工厂（定时和轮询都行）-->
+	 <bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+        <property name="triggers">
+            <list>
+            	<ref bean="cronTrigger"/>
+            	<ref bean="simpleTrigger"/>
+            </list>
+        </property>
+     </bean>
+     
+</beans>  
